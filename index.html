@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ComicCraft</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #11111b;
+            color: #ffffff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1b1b29;
+            padding: 25px;
+            border-radius: 16px;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #29293a;
+            color: white;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #6c63ff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+        }
+
+        #error {
+            display: none;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 9px;
+            background: #512020;
+            color: #ffbaba;
+        }
+
+        #comicResult {
+            margin-top: 30px;
+        }
+
+        .comic-panel {
+            background: #1b1b29;
+            padding: 18px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+        }
+
+        .comic-panel h3 {
+            margin-top: 0;
+        }
+
+        .comic-image {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+        }
+
+        .panel-text {
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #e4e4f2;
+            font-size: 15px;
+            line-height: 1.55;
+            text-align: left;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .panel-text strong {
+            display: block;
+            margin-bottom: 6px;
+            color: white;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            text-align: left;
+        }
+
+        .download-button {
+            display: none;
+            text-decoration: none;
+            text-align: center;
+            background: #242438;
+            color: white;
+            padding: 13px;
+            border-radius: 9px;
+            margin-top: 15px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>ComicCraft</h1>
+
+    <div class="subtitle">
+        AI Comic Story Creator
+    </div>
+
+
+    <div class="card">
+
+        <form id="comicForm">
+
+            <!-- Story idea -->
+
+            <label for="prompt">
+                Story Idea
+            </label>
+
+            <textarea
+                id="prompt"
+                name="prompt"
+                placeholder="Enter your comic story idea..."
+                required
+            ></textarea>
+
+
+            <!-- Main character -->
+
+            <label for="character">
+                Main Character
+            </label>
+
+            <input
+                id="character"
+                name="character"
+                placeholder="Example: Kai, a young space explorer"
+                required
+            >
+
+
+            <!-- Setting -->
+
+            <label for="setting">
+                Setting
+            </label>
+
+            <input
+                id="setting"
+                name="setting"
+                placeholder="Example: A futuristic space station"
+                required
+            >
+
+
+            <!-- Tone -->
+
+            <label for="tone">
+                Story Tone
+            </label>
+
+            <select
+                id="tone"
+                name="tone"
+                required
+            >
+
+                <option value="Funny">
+                    Funny
+                </option>
+
+                <option value="Light-hearted">
+                    Light-hearted
+                </option>
+
+                <option value="Adventure">
+                    Adventure
+                </option>
+
+                <option value="Serious">
+                    Serious
+                </option>
+
+                <option value="Mysterious">
+                    Mysterious
+                </option>
+
+            </select>
+
+
+            <!-- Art style -->
+
+            <label for="style">
+                Art Style
+            </label>
+
+            <input
+                id="style"
+                name="style"
+                placeholder="Example: Comic Book"
+                required
+            >
+
+
+            <!-- Generate -->
+
+            <button
+                id="generateButton"
+                type="submit"
+            >
+                Generate Comic
+            </button>
+
+        </form>
+
+
+        <!-- Loading -->
+
+        <div id="loading">
+            Generating your comic... Please wait.
+        </div>
+
+
+        <!-- Error -->
+
+        <div id="error"></div>
+
+
+        <!-- PDF download -->
+
+        <a
+            id="downloadPdf"
+            class="download-button"
+        >
+            Download Comic PDF
+        </a>
+
+    </div>
+
+
+    <!-- Generated comic -->
+
+    <div id="comicResult"></div>
+
+</div>
+
+
+<script>
+
+    const form =
+        document.getElementById("comicForm");
+
+    const result =
+        document.getElementById("comicResult");
+
+    const loading =
+        document.getElementById("loading");
+
+    const error =
+        document.getElementById("error");
+
+    const generateButton =
+        document.getElementById("generateButton");
+
+    const downloadPdf =
+        document.getElementById("downloadPdf");
+
+
+    /*
+     * Prevent AI-generated text from being
+     * interpreted as HTML.
+     */
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /*
+     * Generate comic
+     */
+
+    form.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            /*
+             * Clear previous result
+             */
+
+            result.innerHTML = "";
+
+            error.style.display = "none";
+
+            downloadPdf.style.display = "none";
+
+
+            /*
+             * Loading state
+             */
+
+            loading.style.display = "block";
+
+            generateButton.disabled = true;
+
+
+            const formData =
+                new FormData(form);
+
+
+            try {
+
+                /*
+                 * Send request to FastAPI
+                 */
+
+                const response =
+                    await fetch(
+                        "/generate",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Comic generation failed."
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                 * Get generated panels
+                 */
+
+                const panels =
+                    data.panels;
+
+
+                /*
+                 * PDF download
+                 */
+
+                if (data.pdf) {
+
+                    downloadPdf.href =
+                        data.pdf;
+
+                    downloadPdf.download =
+                        "ComicCraft-Comic.pdf";
+
+                    downloadPdf.style.display =
+                        "block";
+
+                }
+
+
+                /*
+                 * Render every panel
+                 */
+
+                panels.forEach(
+                    function(panel) {
+
+                        const panelElement =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        panelElement.className =
+                            "comic-panel";
+
+
+                        panelElement.innerHTML = `
+
+                            <h3>
+                                Panel ${panel.panel}
+                            </h3>
+
+                            <img
+                                src="${escapeHTML(panel.image)}"
+                                alt="Comic panel ${panel.panel}"
+                                class="comic-image"
+                                loading="lazy"
+                            >
+
+                            <div class="panel-text">
+
+                                <strong>
+                                    Narration
+                                </strong>
+
+                                ${escapeHTML(
+                                    panel.narration
+                                )}
+
+                            </div>
+
+
+                            <div class="panel-text">
+
+                                <strong>
+                                    Dialogue
+                                </strong>
+
+                                ${escapeHTML(
+                                    panel.dialogue
+                                )}
+
+                            </div>
+
+                        `;
+
+
+                        result.appendChild(
+                            panelElement
+                        );
+
+                    }
+                );
+
+            }
+
+
+            catch (err) {
+
+                error.textContent =
+                    err.message ||
+                    "Something went wrong.";
+
+                error.style.display =
+                    "block";
+
+            }
+
+
+            finally {
+
+                loading.style.display =
+                    "none";
+
+                generateButton.disabled =
+                    false;
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>

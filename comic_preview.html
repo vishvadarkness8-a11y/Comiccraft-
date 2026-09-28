@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Comic Preview - ComicCraft</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            background: #11111b;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .panel {
+            background: #1b1b29;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .text {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        .button {
+            display: block;
+            text-align: center;
+            padding: 13px;
+            margin-top: 20px;
+            background: #6c63ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 9px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Comic Preview</h1>
+
+    {% for panel in panels %}
+
+    <div class="panel">
+
+        <h2>
+            Panel {{ panel.panel }}
+        </h2>
+
+        <img
+            src="{{ panel.image }}"
+            alt="Panel {{ panel.panel }}"
+        >
+
+        <div class="text">
+
+            <strong>Narration</strong>
+
+            <p>
+                {{ panel.narration }}
+            </p>
+
+        </div>
+
+        <div class="text">
+
+            <strong>Dialogue</strong>
+
+            <p>
+                {{ panel.dialogue }}
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    <a
+        href="/export-success"
+        class="button"
+    >
+        Export Comic
+    </a>
+
+</div>
+
+</body>
+
+</html>
